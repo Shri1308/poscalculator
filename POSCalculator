@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MDR Savings Comparison</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 600;
+      font-size: 24px;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 30px;
+      width: 100%;
+      padding: 12px;
+      background-color: #00c9a7;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00b49c;
+    }
+
+    .result {
+      margin-top: 30px;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .highlight {
+      color: #00ffcc;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>MDR Savings Comparison</h2>
+
+    <label for="upi">UPI Collection Last Month (₹):</label>
+    <input type="number" id="upi" placeholder="e.g. 100000">
+
+    <label for="card">Card Collection This Month (₹):</label>
+    <input type="number" id="card" placeholder="e.g. 50000">
+
+    <label for="current">Current Account Variant:</label>
+    <select id="current">
+      <option value="50K">50K</option>
+      <option value="1L">1L</option>
+      <option value="2L">2L</option>
+    </select>
+
+    <label for="upgrade">Compare With (Upgraded Variant):</label>
+    <select id="upgrade">
+      <option value="50K">50K</option>
+      <option value="1L">1L</option>
+      <option value="2L">2L</option>
+    </select>
+
+    <button onclick="compare()">Compare Savings</button>
+
+    <div class="result" id="output"></div>
+  </div>
+
+  <script>
+    function compare() {
+      const upi = parseFloat(document.getElementById("upi").value);
+      const card = parseFloat(document.getElementById("card").value);
+      const current = document.getElementById("current").value;
+      const upgrade = document.getElementById("upgrade").value;
+
+      if (isNaN(upi) || isNaN(card)) {
+        document.getElementById("output").innerHTML = "Please enter valid numbers.";
+        return;
+      }
+
+      const limits = { "50K": 0.10, "1L": 0.12, "2L": 0.15 };
+      const mdrRate = 0.015;
+
+      const currentFree = upi * limits[current];
+      const upgradeFree = upi * limits[upgrade];
+
+      const currentChargeable = Math.max(0, card - currentFree);
+      const upgradeChargeable = Math.max(0, card - upgradeFree);
+
+      const currentSavings = currentChargeable * mdrRate;
+      const upgradeSavings = upgradeChargeable * mdrRate;
+
+      const benefit = currentSavings - upgradeSavings;
+
+      document.getElementById("output").innerHTML = `
+        <strong>Current Variant (${current}):</strong><br>
+        Free Limit: ₹${currentFree.toFixed(2)}<br>
+        Chargeable Amount: ₹${currentChargeable.toFixed(2)}<br>
+        MDR Charges: ₹${currentSavings.toFixed(2)}<br><br>
+
+        <strong>Upgraded Variant (${upgrade}):</strong><br>
+        Free Limit: ₹${upgradeFree.toFixed(2)}<br>
+        Chargeable Amount: ₹${upgradeChargeable.toFixed(2)}<br>
+        MDR Charges: ₹${upgradeSavings.toFixed(2)}<br><br>
+
+        <span class="highlight">💰 Potential Savings by Upgrading: ₹${benefit.toFixed(2)}</span>
+      `;
+    }
+  </script>
+</body>
+</html>
